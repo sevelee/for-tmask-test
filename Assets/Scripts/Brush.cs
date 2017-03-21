@@ -16,6 +16,7 @@ public class Brush : MonoBehaviour {
 
 	#region Private Variables
 
+	[SerializeField]
 	Texture2D maskTexture;
 
 	Material maskMaterial;
@@ -31,6 +32,8 @@ public class Brush : MonoBehaviour {
 		maskTexture = new Texture2D (originalMaskTexture.width, originalMaskTexture.height);
 		Graphics.CopyTexture (originalMaskTexture, maskTexture);
 		maskMaterial = gameObject.GetComponent<Renderer> ().material;
+		maskTexture.Apply ();
+		UpdateTextureToMaterial ();
 	}
 
 	void Start () {

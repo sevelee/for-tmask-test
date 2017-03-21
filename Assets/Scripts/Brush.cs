@@ -16,7 +16,6 @@ public class Brush : MonoBehaviour {
 
 	#region Private Variables
 
-	[SerializeField]
 	Texture2D maskTexture;
 
 	Material maskMaterial;
@@ -93,20 +92,40 @@ public class Brush : MonoBehaviour {
 	void AddBrushToMask(int startx, int starty)
 	{
 		Color brushColor, maskColor, finalColor;
-		for (int i = startx; i < startx + brushTexture.width; ++i)
+		Color[] finalColors, brushColors, maskColors;
+
+		int bWidth, bHeight;
+		bWidth = brushTexture.width;
+		bHeight = brushTexture.height;
+
+		int startPositionX, startPositionY;
+		startPositionX = startx - bWidth / 2;
+		startPositionY = starty - bHeight / 2;
+
+		startPositionX = (startPositionX < 0) ? 0 : startPositionX;
+		startPositionY = (startPositionY < 0) ? 0 : startPositionY;
+
+		//waiting for further developement
+		int brushStartX, brushStartY;
+
+		bWidth = (bWidth + startPositionX > maskTexture.width) ? (maskTexture.width - startPositionX) : bWidth;
+		bHeight = (bHeight + startPositionY > maskTexture.height) ? (maskTexture.height - startPositionY) : bHeight;
+
+		finalColors = new Color[bWidth * bHeight];
+		brushColors = new Color[finalColors.Length];
+		maskColors = new Color[finalColors.Length];
+
+		brushColors = brushTexture.GetPixels (0, 0, bWidth, bHeight);
+		maskColors = maskTexture.GetPixels (startPositionX, startPositionY, bWidth, bHeight);
+
+		int finalColorIndex = 0;
+
+		for (int i = 0; i < brushColors.Length; ++i)
 		{
-			for (int j = starty; j < starty + brushTexture.height; ++j)
-			{
-				if (InsideMaskTexture(i, j))
-				{
-					brushColor = brushTexture.GetPixel (i - startx, j - starty);
-					maskColor = maskTexture.GetPixel (i, j);
-					finalColor = addBrushColor (brushColor, maskColor);
-					Color debugColor = Color.red;
-					maskTexture.SetPixel (i, j, finalColor);
-				}
-			}
+			finalColors [i] = addBrushColor (brushColors [i], maskColors [i]);
 		}
+			
+		maskTexture.SetPixels (startPositionX, startPositionY, bWidth, bHeight, finalColors);
 		maskTexture.Apply ();
 	}
 		
